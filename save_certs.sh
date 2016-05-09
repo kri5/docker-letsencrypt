@@ -15,14 +15,14 @@ if [ -z "$SECRET_NAME" ]; then
     exit 1
 fi
 
-CERT_LOCATION='/etc/letsencrypt/live'
+CERT_LOCATION='./.lego/certificates/'
 
 DOMAINS=($DOMAINS)
 
 DOMAIN=${DOMAINS[0]}
 
-CERT=$(cat $CERT_LOCATION/$DOMAIN/fullchain.pem | base64 --wrap=0)
-KEY=$(cat $CERT_LOCATION/$DOMAIN/privkey.pem | base64 --wrap=0)
+CERT=$(cat $CERT_LOCATION/$DOMAIN.crt | base64 --wrap=0)
+KEY=$(cat $CERT_LOCATION/$DOMAIN.key | base64 --wrap=0)
 DHPARAM=$(openssl dhparam 2048 | base64 --wrap=0)
 
 kubectl get secrets $SECRET_NAME && ACTION=replace || ACTION=create;

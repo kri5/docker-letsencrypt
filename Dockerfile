@@ -1,18 +1,14 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install -y git wget cron bc
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get install -qqy git wget cron bc xz-utils
 
-RUN mkdir -p /letsencrypt/challenges/.well-known/acme-challenge
-RUN git clone https://github.com/letsencrypt/letsencrypt /letsencrypt/app
-WORKDIR /letsencrypt/app
-RUN ./letsencrypt-auto; exit 0
-
-# You should see "OK" if you go to http://<domain>/.well-known/acme-challenge/health
-
-RUN echo "OK" > /letsencrypt/challenges/.well-known/acme-challenge/health
+#Install lego
+RUN wget -q https://github.com/xenolf/lego/releases/download/v0.3.1/lego_linux_amd64.tar.xz
+RUN tar xf lego_linux_amd64.tar.xz
+RUN chmod +x lego
 
 # Install kubectl
-RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.2.2/bin/linux/amd64/kubectl
+RUN wget -q https://storage.googleapis.com/kubernetes-release/release/v1.2.2/bin/linux/amd64/kubectl
 RUN chmod +x kubectl
 RUN mv kubectl /usr/local/bin/
 
@@ -23,8 +19,7 @@ ADD recreate_pods.sh /letsencrypt/
 ADD refresh_certs.sh /letsencrypt/
 ADD start.sh /letsencrypt/
 
-
-RUN ln -s /root/.local/share/letsencrypt/bin/letsencrypt /usr/local/bin/letsencrypt
+RUN mv lego/lego /letsencrypt
 
 WORKDIR /letsencrypt
 

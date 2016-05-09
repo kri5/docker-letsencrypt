@@ -20,8 +20,10 @@ do
    # do whatever on $i
 done
 
-/usr/local/bin/letsencrypt certonly \
-    --webroot -w /letsencrypt/challenges/ \
-    --text --renew-by-default --agree-tos \
-      $domain_args \
-     --email=$EMAIL
+/letsencrypt/lego \
+    $domain_args \
+    --accept-tos \
+    --dns "gcloud" \
+    --email $EMAIL \
+    -s $LETSENCRYPT_ENDPOINT \
+    run
